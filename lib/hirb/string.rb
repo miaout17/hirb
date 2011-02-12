@@ -1,4 +1,6 @@
-require 'unicode/display_width'
+# require 'unicode/display_width'
+require 'console'
+$KCODE = 'u'
 
 module Hirb
   # Provides string helpers to deal with UTF-8 and ruby 1.8.x
@@ -9,7 +11,7 @@ module Hirb
     # :stopdoc:
 
     def display_width(string)
-      string.display_width
+      ::Console.display_width(string)
     end
 
     def ljust(string, desired_length)
@@ -30,19 +32,8 @@ module Hirb
     # The first string has most possible length but can't be longer than width
     def split_at_display_width(string, width)
       chars = string.chars.to_a
-
-      current_length = 0
-      split_index = 0
-      chars.each_with_index do |c, i|
-        char_width = display_width(c)
-        break if current_length + char_width > width
-        split_index = i+1
-        current_length += char_width
-      end
-
-      split_index ||= chars.count
-      head = chars[0, split_index].join
-      tail = chars[split_index, chars.count].join
+      head = ::Console.display_slice(string, 0, width+1, "")
+      tail = chars[head.chars.count, chars.count].join
       [head, tail]
     end
 
